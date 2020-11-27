@@ -1,0 +1,4 @@
+name: WorldChef
+version: ${project.version}
+main: be4rjp.worldchef.Main
+author: Be4rJP
