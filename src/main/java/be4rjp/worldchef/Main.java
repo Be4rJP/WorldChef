@@ -1,6 +1,7 @@
 package be4rjp.worldchef;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public final class Main extends JavaPlugin {
     
@@ -30,8 +31,22 @@ public final class Main extends JavaPlugin {
             worldChefAPI = new WorldChefAPI(this, zipFolderPath, worldFolderPath, showLogs, showErrors);
             worldChefAPI.loadZips();
             worldChefAPI.unZip(config.getConfig().getInt("buffer-size"));
-            if(config.getConfig().getBoolean("load-worlds"))
-                worldChefAPI.loadWorlds();
+        }
+        //-------------------------------------------------------------------
+        
+        
+        //---------------------------Load worlds-----------------------------
+        if(config.getConfig().getBoolean("stand-alone")){
+            if(config.getConfig().getBoolean("load-worlds")) {
+                BukkitRunnable task = new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        boolean success = worldChefAPI.loadWorlds();
+                        if(success) {cancel();}
+                    }
+                };
+                task.runTaskTimer(this, 20, 20);
+            }
         }
         //-------------------------------------------------------------------
     }

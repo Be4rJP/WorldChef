@@ -26,11 +26,44 @@ show-logs: true
 #エラーログを出力するかどうかの設定
 show-errors: true
 
-#ZIP解凍を実行するときのバッファサイズ
+#zip解凍を実行するときのバッファサイズ
 buffer-size: 1024
 
-#ワールドを解凍した後に読み込みを実行するかどうかの設定
-load-worlds: true
+#ワールドを解凍した後に自動的に読み込みを実行するかどうかの設定
+#false 推奨
+load-worlds: false
+```
+
+##### Example of API usage:
+```java
+public class ExamplePlugin extends JavaPlugin {
+
+	private static ExamplePlugin instance;
+	private WorldChefAPI worldChefAPI;
+
+	@Override
+	public void onEnable() {
+		instance = this;
+		worldChefAPI = new GlowingAPI(instance);
+
+		String zipFolderPath = "maps";
+		String worldFolderPath = "";
+		boolean showLogs = true;
+		boolean showErrors = true;
+		worldChefAPI = new WorldChefAPI(this, zipFolderPath, worldFolderPath, showLogs, showErrors);
+		worldChefAPI.loadZips();
+		worldChefAPI.unZip(1024);
+	}
+
+	public static ExamplePlugin getInstance() {
+		return instance;
+	}
+
+	public WorldChefAPI getWorldChefAPI() {
+		return worldChefAPI;
+	}
+
+}
 ```
 
 ## License

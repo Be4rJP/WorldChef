@@ -71,6 +71,7 @@ public class WorldChefAPI {
         
         try {
             File dir = new File(zipFolderPath);
+            dir.mkdir();
             File[] list = dir.listFiles();
             for (int i = 0; i < list.length; i++) {
                 File file = list[i];
@@ -79,19 +80,13 @@ public class WorldChefAPI {
                     String worldName = file.getName().replace(".zip", "");
                     worldNameList.add(worldName);
     
-                    BukkitRunnable task = new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            putLogs("ZipFile : " + worldName + ".zip", LogType.INFO);
-                        }
-                    };
-                    task.runTaskLater(plugin, 140);
+                    putLogs("ZipFile : " + worldName + ".zip", LogType.INFO);
                 }
             }
             return true;
         }catch (Exception e){
             if(this.showErrors) {
-                putLogs("Some trouble occurred when tried to load worlds!", LogType.WARNING);
+                putLogs("Some trouble occurred when tried to load zips!", LogType.WARNING);
                 e.printStackTrace();
             }
             return false;
@@ -132,6 +127,7 @@ public class WorldChefAPI {
                 while ( enumZip.hasMoreElements() ) {
                     ZipEntry zipEntry = (java.util.zip.ZipEntry)enumZip.nextElement();
                     File unzipFile = new File(this.worldFolderPath);
+                    unzipFile.mkdir();
                     File outFile = new File(unzipFile.getAbsolutePath() + "/" + baseDir.getName(), zipEntry.getName());
             
                     if ( zipEntry.isDirectory() )
@@ -159,7 +155,7 @@ public class WorldChefAPI {
                 index++;
                 success = false;
                 if(this.showErrors) {
-                    putLogs("Some trouble occurred when tried to load worlds!", LogType.WARNING);
+                    putLogs("Some trouble occurred when tried to unzip!", LogType.WARNING);
                     e.printStackTrace();
                 }
             } finally {
@@ -171,6 +167,11 @@ public class WorldChefAPI {
         return success;
     }
     
+    /**
+     * Load worlds
+     *
+     * @return boolean if loading world was successful.
+     */
     public boolean loadWorlds(){
         putLogs("Loading worlds...", LogType.INFO);
         
