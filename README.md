@@ -13,9 +13,9 @@
 #API機能のみを使いたい場合は false 推奨
 stand-alone: true
 
-#ZIPファイルが入っているフォルダと解凍したワールドを入れるためのフォルダ
+#zipファイルが入っているフォルダと解凍したワールドを入れるためのフォルダ
 #指定したパスの前にはサーバーを実行しているフォルダのパスが指定される
-#world-foldersは通常では空欄を指定
+#world-folderは通常では空欄を指定
 folder-path:
   zip-files: 'maps'
   world-folder: ''
