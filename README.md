@@ -8,6 +8,10 @@
 * サーバーのpluginsフォルダにWorldChef.jarを入れる
 * サーバーを起動する
 * WorldChefフォルダとその中にconfig.ymlが生成されているので任意で書き換える
+* config.ymlの zip-files: で指定した名前のフォルダをサーバーのフォルダ内に作り、その中にワールドのzipファイルを入れる
+
+
+##### config.yml
 ```yaml
 #このプラグインの設定を読み込んで自動的にzipファイルの解凍をするかどうかの設定
 #API機能のみを使いたい場合は false 推奨

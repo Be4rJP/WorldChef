@@ -94,7 +94,7 @@ public class WorldChefAPI {
     }
     
     /**
-     * Checks if the entity is glowing for the receiver.
+     * Unzip world files.
      *
      * @param bufferSize The buffer size to unzip.
      *                   If you specify the void, it run at bufferSize=1024.
