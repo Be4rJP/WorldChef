@@ -51,7 +51,7 @@ public class WorldChefAPI {
     /**
      * Output logs
      */
-    private void putLogs(String log, LogType logType){
+    public void putLogs(String log, LogType logType){
         if(!this.showLogs) return;
         switch(logType){
             case INFO:
@@ -86,7 +86,7 @@ public class WorldChefAPI {
             return true;
         }catch (Exception e){
             if(this.showErrors) {
-                putLogs("Some trouble occurred when tried to load zips!", LogType.WARNING);
+                putLogs("Some error has occurred when tried to load zips!", LogType.WARNING);
                 e.printStackTrace();
             }
             return false;
@@ -110,58 +110,42 @@ public class WorldChefAPI {
     
     private boolean doUnZip(int bufferSize){
         putLogs("Extracting zip files...", LogType.INFO);
-        
-        int index = 0;
-        boolean success = true;
+
+        //解凍開始時間
+        long startTime = System.currentTimeMillis();
+
+        //複数のzipファイルをマルチスレッドで解凍
+        List<UnZipAsync> taskList = new ArrayList<>();
         for(String zipFilePath : zipList){
-    
-            File baseFile = new File(zipFilePath);
-            File baseDir = new File(baseFile.getParent(), baseFile.getName().substring(0, baseFile.getName().lastIndexOf(".")));
-            baseDir.mkdir();
-    
-            ZipFile zipFile = null;
+            UnZipAsync unZipAsync = new UnZipAsync(this, zipFilePath, bufferSize);
+            unZipAsync.start();
+            taskList.add(unZipAsync);
+        }
+
+        boolean success = true;
+        //全ての処理が終わるまで待つ
+        for(UnZipAsync unZipAsync : taskList){
             try {
-                zipFile = new ZipFile(zipFilePath);
-                Enumeration<? extends ZipEntry> enumZip = zipFile.entries();
-                
-                while ( enumZip.hasMoreElements() ) {
-                    ZipEntry zipEntry = (java.util.zip.ZipEntry)enumZip.nextElement();
-                    File unzipFile = new File(this.worldFolderPath);
-                    unzipFile.mkdir();
-                    File outFile = new File(unzipFile.getAbsolutePath() + "/" + baseDir.getName(), zipEntry.getName());
-            
-                    if ( zipEntry.isDirectory() )
-                        outFile.mkdir();
-                    else {
-                        BufferedInputStream in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-                        
-                        if ( !outFile.getParentFile().exists() )
-                            outFile.getParentFile().mkdirs();
-                        
-                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
-                        
-                        byte[] buffer = new byte[bufferSize];
-                        
-                        int readSize = 0;
-                        while ( (readSize = in.read(buffer)) != -1 ) {
-                            out.write(buffer, 0, readSize);
-                        }
-                        try { out.close(); } catch (Exception e) {}
-                        try { in.close(); } catch (Exception e) {}
-                    }
-                }
-                index++;
-            } catch(Exception e) {
-                index++;
+                unZipAsync.join();
+                if(!unZipAsync.isSuccess())
+                    success = false;
+            } catch (InterruptedException e) {
                 success = false;
                 if(this.showErrors) {
-                    putLogs("Some trouble occurred when tried to unzip!", LogType.WARNING);
+                    putLogs("Some error has occurred when wait unzip async task!", LogType.WARNING);
                     e.printStackTrace();
                 }
-            } finally {
-                if ( zipFile != null )
-                    try { zipFile.close();  } catch (Exception e) {}
+                e.printStackTrace();
             }
+        }
+
+        //解凍終了時間
+        long endTime = System.currentTimeMillis();
+
+        if(showLogs) {
+            if(success)
+                putLogs("Success!", LogType.INFO);
+            putLogs("The unzip tasks was all done in " + (endTime - startTime) + "ms.", LogType.INFO);
         }
         
         return success;
@@ -182,11 +166,32 @@ public class WorldChefAPI {
             }catch (Exception e){
                 success = false;
                 if(this.showErrors) {
-                    putLogs("Some trouble occurred when tried to load worlds!", LogType.WARNING);
+                    putLogs("Some error has occurred when tried to load worlds!", LogType.WARNING);
                     e.printStackTrace();
                 }
             }
         }
         return success;
     }
+
+
+    /**
+     * @return String zip folder path.
+     */
+    public String getZipFolderPath(){return this.zipFolderPath;}
+
+    /**
+     * @return String world folder path.
+     */
+    public String getWorldFolderPath(){return this.worldFolderPath;}
+
+    /**
+     * @return boolean if show error logs.
+     */
+    public boolean isShowErrors() {return showErrors;}
+
+    /**
+     * @return boolean if show logs.
+     */
+    public boolean isShowLogs() {return showLogs;}
 }
