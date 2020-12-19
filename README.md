@@ -48,7 +48,7 @@ public class ExamplePlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
-		worldChefAPI = new GlowingAPI(instance);
+		worldChefAPI = new WorldChefAPI(instance);
 
 		String zipFolderPath = "maps";
 		String worldFolderPath = "";
